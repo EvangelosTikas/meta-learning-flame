@@ -1,0 +1,21 @@
+numpy
+scipy
+matplotlib
+pandas
+seaborn
+scikit-learn
+
+
+torch
+torchvision
+
+// meta-learning
+learn2learn
+
+
+// network
+urllib
+
+// utilities
+tqdm
+-e .

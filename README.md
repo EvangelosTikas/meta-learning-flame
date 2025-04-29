@@ -1,7 +1,7 @@
 # Meta-Flame (Under Construction)
 
 This GitHub repository provides a well-structured code repository for optimizing runs for Meta-Learning tasks. Its
-main focus is Computer-Vision (CV) tasks. You can utilize open-source datasets for running ML flows and connecting with API
+main focus is Computer-Vision (CV), GenAI and MultiModal applications. You can utilize open-source datasets for running ML flows and connecting with API
 easily, with little code knowledge. Speed is key for a fast and efficient AI toolbox, and we provide a user-friendly
 tool for learning, optimization, research as well as enterprise sollutions.
 

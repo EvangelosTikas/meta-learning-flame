@@ -32,9 +32,9 @@ def get_requirements(file_path:str)->List[str]:
 setuptools.setup(
     name=SRC_REPO,
     version=__version__,
-    author=AUTHOR_USER_NAME,
-    author_email=AUTHOR_EMAIL,
-    description="A template directory for ML/DL Applications.",
+    author="Evangelos Tikas",
+    author_email="vagtikas@gmail.com",
+    description="A template directory for Meta-Learning Applications.",
     long_description=long_description,
     long_description_content="text/markdown",
     url=f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}",

@@ -13,7 +13,7 @@ from data_loaders import download_if_url
 from torchvision import datasets
 
 
-# TODO: add more formats
+# TODO: add more formats, txt -> extract text from .html sources
 TEXT_EXT = {'.txt', '.json'}
 IMAGE_EXT = {'.jpg', '.jpeg', '.png', '.bmp'}
 AUDIO_EXT = {'.wav', '.mp3', '.flac'}
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     # Sample WAV from an online source (short beep tone)
     audio_url = "https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand3.wav"
-    txt_url = "https://en.wikipedia.org/wiki/Artificial_intelligence"
+    txt_url = "https://txt2html.sourceforge.net/sample.txt"
 
     data = [
         {"type": "image", "source": "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png", "label": 0},

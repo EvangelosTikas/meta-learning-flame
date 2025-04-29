@@ -8,12 +8,16 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 from transformers import AutoTokenizer
-from .data_transformation import get_preprocessor
-from .data_loaders import download_if_url
+from data_transformation import get_preprocessor
+from data_loaders import download_if_url
+from torchvision import datasets
 
+
+# TODO: add more formats
 TEXT_EXT = {'.txt', '.json'}
 IMAGE_EXT = {'.jpg', '.jpeg', '.png', '.bmp'}
 AUDIO_EXT = {'.wav', '.mp3', '.flac'}
+
 
 class MultiModalDataset(Dataset):
     def __init__(self, data_entries, task='auto', transform=None, tokenizer_name="bert-base-uncased"):
@@ -65,21 +69,44 @@ class MultiModalDataset(Dataset):
             return tokens, label
 
         elif data_type == "audio":
-            waveform, sr = torchaudio.load(path)
+            local_path = download_if_url(source)  # handles both URL and local
+            waveform, sr = torchaudio.load(local_path)
             return waveform, label
 
         else:
             raise ValueError("Unsupported data type")
 
 
+def load_builtin(name, root="./data", train=True, transform=None):
+    if name == "mnist":
+        return datasets.MNIST(root=root, train=train, download=True, transform=transform)
+    elif name == "cifar10":
+        return datasets.CIFAR10(root=root, train=train, download=True, transform=transform)
+    # Add more : TODO
+
+
+
 if __name__ == "__main__":
     from torch.utils.data import DataLoader
 
+    # Sample WAV from an online source (short beep tone)
+    audio_url = "https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand3.wav"
+    txt_url = "https://en.wikipedia.org/wiki/Artificial_intelligence"
+
     data = [
         {"type": "image", "source": "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png", "label": 0},
-        {"type": "text", "source": "sample.txt", "label": 1},
-        {"type": "audio", "source": "sample.wav", "label": 2},
+        {"type": "text", "source": txt_url, "label": 1},
+        {"type": "audio", "source": audio_url, "label": "star-wars"},
     ]
 
     dataset = MultiModalDataset(data)
     loader = DataLoader(dataset, batch_size=2, shuffle=True)
+
+    try:
+        for batch in loader:
+            print(batch)
+    except SystemError:
+        print(f"[Error]: File(s) {data} not found or corrupted.")
+    except Exception as e:
+        print(f"[Error]: Uknown error {e}")
+        

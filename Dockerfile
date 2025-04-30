@@ -10,19 +10,22 @@ ENV PYTHONUNBUFFERED=1
 # 3. Set working directory inside the container
 WORKDIR /app
 
-# 4. Install system dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 5. Upgrade pip and install pip-tools (for dependency resolution)
+# Upgrade pip and install pip-tools (for dependency resolution)
 RUN pip install --upgrade pip \
     && pip install pip-tools
 
-# 6. Copy the requirements file into the container
-COPY requirements.txt .
+# Copy the requirements file into the container
+COPY requirements.in .
+RUN pip-compile requirements.in --output-file=requirements.txt \
+    && pip install -r requirements.txt
+
 
 # 7. Compile and install dependencies safely
 # This ensures conflicts are caught if packages are incompatible

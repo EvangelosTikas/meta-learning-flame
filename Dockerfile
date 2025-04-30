@@ -1,33 +1,27 @@
-# 1. Choose a lightweight official Python image
+# 1. Use a lightweight Python image
 FROM python:3.10-slim
 
-# 2. Set environment variables
-# No .pyc files
+# 2. Environment setup
 ENV PYTHONDONTWRITEBYTECODE=1  
-# Instant log output
 ENV PYTHONUNBUFFERED=1         
 
-# 3. Set working directory inside the container
+# 3. Working directory
 WORKDIR /app
 
-# Install dependencies
+# 4. Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and install pip-tools (for dependency resolution)
+# 5. Upgrade pip and install pip-tools
 RUN pip install --upgrade pip \
     && pip install pip-tools
 
-# Copy the requirements file into the container
-COPY requirements.in .
+# 6. Copy project files (includes pyproject.toml, requirements.in, source code)
+COPY . /app
+
+# 7. Compile and install dependencies
 RUN pip-compile requirements.in --output-file=requirements.txt \
     && pip install -r requirements.txt
-
-
-# 7. Compile and install dependencies safely
-# This ensures conflicts are caught if packages are incompatible
-RUN pip-compile requirements.txt --output-file=requirements-locked.txt \
-    && pip install -r requirements-locked.txt

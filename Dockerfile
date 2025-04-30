@@ -21,7 +21,7 @@ RUN pip install --upgrade pip \
 
 # 6. Copy project files (includes pyproject.toml, requirements.in, source code)
 COPY . /app
-
+COPY requirements.in .
 # 7. Compile and install dependencies
 RUN pip-compile requirements.in --output-file=requirements.txt \
     && pip install -r requirements.txt

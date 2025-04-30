@@ -1,3 +1,4 @@
+-e .
 numpy
 scipy
 matplotlib
@@ -22,5 +23,3 @@ requests
 tqdm
 librosa
 pathlib
-
--e .

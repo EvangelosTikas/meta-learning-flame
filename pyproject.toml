@@ -1,0 +1,21 @@
+[project]
+name = "meta-learning-flame"
+version = "0.0.0"
+description = "A fast and optimized Meta-Learning project to run everywhere"
+authors = [
+    { name = "Evangelos Tikas", email = "vagtikas@gmail.com" },
+]
+requires-python = ">=3.9,<3.11"
+dependencies = [
+    # project dependencies
+    "torch>=2.7.0",
+    "numpy>=1.26.4",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*"]

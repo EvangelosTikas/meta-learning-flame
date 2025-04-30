@@ -25,4 +25,3 @@ def download_if_url(path_or_url):
         return tmp.name
     else:
         return path_or_url
-

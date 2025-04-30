@@ -37,7 +37,7 @@ list_of_files = [
     "main.py",
     "tests/__init__.py",
     "Dockerfile"
-    
+
 ]
 
 
@@ -58,4 +58,3 @@ for filepath in list_of_files:
 
     else:
         logging.info(f"{filename} is already exists")
-

@@ -20,7 +20,7 @@ RUN pip install --upgrade pip \
     && pip install pip-tools
 
 # 6. Copy project files (includes pyproject.toml, requirements.in, source code)
-COPY requirements.in .
+
 COPY . /app
 
 # 7. Compile and install dependencies

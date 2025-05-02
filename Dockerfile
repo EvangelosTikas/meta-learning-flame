@@ -24,5 +24,5 @@ RUN pip install --upgrade pip \
 COPY . /app
 
 # 7. Compile and install dependencies
-RUN pip-compile requirements.in --output-file=requirements.txt
-RUN pip install -r requirements.txt
+RUN pip-compile ./requirements.in --output-file=requirements.txt
+RUN pip install -r ./requirements.txt

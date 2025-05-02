@@ -1,0 +1,22 @@
+[project]
+name = "meta-learning-flame"
+version = "0.0.0"
+description = "A fast and optimized Meta-Learning project to run everywhere"
+authors = [
+    { name = "Evangelos Tikas", email = "vagtikas@gmail.com" },
+]
+readme = "README.md"
+requires-python = ">=3.9,<3.11"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*"]
+
+# Optional
+[project.urls]
+Homepage = "https://github.com/EvangelosTikas/meta-learning-flame"

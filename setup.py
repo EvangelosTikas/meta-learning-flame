@@ -7,10 +7,10 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 __version__ = "0.0.0"
 
-REPO_NAME = "MLTMPLTE"
-AUTHOR_USER_NAME = "adityaiiitmk"
-SRC_REPO = "MLTMPLTE"
-AUTHOR_EMAIL = "aditya.s@duk.ac.in"
+REPO_NAME = "meta-learning-flame"
+AUTHOR_USER_NAME = "EvangelosTikas"
+SRC_REPO = "meta-flame"
+AUTHOR_EMAIL = "vagtikas@gmail.com"
 
 
 HYPEN_E_DOT='-e .'
@@ -25,7 +25,7 @@ def get_requirements(file_path:str)->List[str]:
 
         if HYPEN_E_DOT in requirements:
             requirements.remove(HYPEN_E_DOT)
-    
+
     return requirements
 
 

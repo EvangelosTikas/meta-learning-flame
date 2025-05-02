@@ -16,7 +16,7 @@ template focus on fast-paced runs. With this structure, you can:
 * Maintain clear documentation and logs.
 * Enable reproducibility of experiments.
 
-## Folder Structure 
+## Folder Structure
 
 ```
 project-root/

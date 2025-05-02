@@ -37,7 +37,7 @@ list_of_files = [
     "main.py",
     "tests/__init__.py",
     "Dockerfile"
-    
+
 ]
 
 

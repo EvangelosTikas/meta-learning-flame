@@ -1,5 +1,15 @@
-__pycache__/
+__pycache__
 *.log
 *.ipynb
 datasets/
 checkpoints/
+.git
+*.pyc
+*.pyo
+*.pyd
+.env
+*.egg-info
+.eggs
+.idea
+.vscode
+tests/

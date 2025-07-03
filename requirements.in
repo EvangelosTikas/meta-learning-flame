@@ -11,6 +11,7 @@ transformers
 torch
 torchvision
 torchaudio
+torchmeta
 
 # meta-learning
 learn2learn
@@ -23,3 +24,6 @@ requests
 tqdm
 librosa
 pathlib
+
+# testing
+pytest

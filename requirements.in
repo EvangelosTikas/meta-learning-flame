@@ -8,17 +8,17 @@ scikit-learn
 transformers
 
 
-torch
-torchvision
-torchaudio
-torchmeta
+torch==2.2.1
+torchvision==0.17.1
+torchaudio==2.2.1
+
 
 # meta-learning
 learn2learn
 
 
 #  network
-requests
+requests>=2.25,<3
 
 #  utilities
 tqdm

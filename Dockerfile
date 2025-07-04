@@ -22,14 +22,13 @@ RUN pip install --upgrade pip \
 # 6. Copy project
 COPY requirements.in .
 
-# 7. Compile and install deps
-RUN pip-compile requirements.in \
-    pip install --no-deps -r requirements.txt
-
+# 7. Compile and install deps +
 # 8. Clean up (only after all installs)
-RUN apt-get purge -y build-essential git curl \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/* ~/.cache/pip
+RUN pip-compile requirements.in \
+ && pip install -r requirements.txt \
+ && apt-get purge -y build-essential git curl \
+ && apt-get autoremove -y \
+ && rm -rf /var/lib/apt/lists/* ~/.cache/pip
 
 # 9. Copy source code
 COPY . .

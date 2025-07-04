@@ -1,22 +1,34 @@
+# 1. Use lightweight image
 FROM python:3.10-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+# 2. Env
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
+# 3. Working dir
 WORKDIR /app
 
-# System deps + pip install + cleanup
+# 4. Install only needed system tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential curl git \
- && pip install --upgrade pip pip-tools \
- && rm -rf /var/lib/apt/lists/*
+    build-essential \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
+# 5. Upgrade pip & install pip-tools
+RUN pip install --upgrade pip \
+    && pip install pip-tools
+
+# 6. Copy project
 COPY requirements.in .
-RUN pip-compile requirements.in && pip install -r requirements.txt \
+
+# 7. Compile and install deps +
+# 8. Clean up (only after all installs)
+RUN pip-compile requirements.in \
+ && pip install -r requirements.txt \
  && apt-get purge -y build-essential git curl \
  && apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/* ~/.cache/pip
 
+# 9. Copy source code
 COPY . .
-
-CMD ["python", "main.py"]

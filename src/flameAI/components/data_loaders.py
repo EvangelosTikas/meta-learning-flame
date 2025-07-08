@@ -5,7 +5,7 @@ import warnings
 
 from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
-import learn2learn as l2l
+import learn2learn
 
 # Optional: Dict registry for custom datasets
 CUSTOM_LOADERS = {}
@@ -90,24 +90,24 @@ class MetaDatasetLoader:
 
     def _load_l2l_dataset(self):
         dataset_cls = {
-            "omniglot": l2l.vision.datasets.FullOmniglot,
-            "miniimagenet": l2l.vision.datasets.MiniImageNet,
-            "fc100": l2l.vision.datasets.FC100,
-            "cifarfs": l2l.vision.datasets.CIFARFS,
-            "tieredimagenet": l2l.vision.datasets.TieredImageNet
+            "omniglot": learn2learn.vision.datasets.FullOmniglot,
+            "miniimagenet": learn2learn.vision.datasets.MiniImageNet,
+            "fc100": learn2learn.vision.datasets.FC100,
+            "cifarfs": learn2learn.vision.datasets.CIFARFS,
+            "tieredimagenet": learn2learn.vision.datasets.TieredImageNet
         }.get(self.dataset_name)
 
         transform = self.custom_transforms or self._default_transform(self.dataset_name)
         base = dataset_cls(root=self.root, download=self.download, transform=transform)
 
-        meta_dataset = l2l.data.TaskDataset(
+        meta_dataset = learn2learn.data.TaskDataset(
             base,
             task_transforms=[
-                l2l.data.transforms.NWays(base, self.ways),
-                l2l.data.transforms.KShots(base, self.shots + self.test_shots),
-                l2l.data.transforms.LoadData(base),
-                l2l.data.transforms.RemapLabels(base),
-                l2l.data.transforms.ConsecutiveLabels(base),
+                learn2learn.data.transforms.NWays(base, self.ways),
+                learn2learn.data.transforms.KShots(base, self.shots + self.test_shots),
+                learn2learn.data.transforms.LoadData(base),
+                learn2learn.data.transforms.RemapLabels(base),
+                learn2learn.data.transforms.ConsecutiveLabels(base),
             ],
             num_tasks=self.batch_size
         )
@@ -134,6 +134,9 @@ class MetaDatasetLoader:
 
 def register_dataset(name: str, loader_fn):
     """Register a custom dataset"""
+    if not callable(loader_fn):
+        raise TypeError("loader_fn must be callable")
+
     CUSTOM_LOADERS[name.lower()] = loader_fn
 
 
@@ -147,7 +150,7 @@ if __name__ == "__main__":
     )
 
     for task in loader.get_dataloader():
-        if isinstance(task, dict):  # l2l task
+        if isinstance(task, dict):  # learn2learn task
             x, y = task['data'], task['labels']
         else:  # torchvision fallback
             x, y = task

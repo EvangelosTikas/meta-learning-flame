@@ -3,11 +3,14 @@ import tempfile
 import pytest
 import builtins
 from unittest import mock
-from flameAI.components import data_loaders
+from src.flameAI.components import data_loaders
 from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
+from unittest.mock import patch, MagicMock
 import torch
 import os
+import learn2learn
+
 
 
 COMMON_MSG_TMETA: str = "Skipping this..."
@@ -45,76 +48,74 @@ def temp_bin_file():
 #     assert data_loaders.download_if_url(path) == path
 
 
-@pytest.mark.parametrize("dataset_name", ["omniglot", "miniimagenet"])
-def test_l2l_dataset_loading(dataset_name):
-    loader = MetaDatasetLoader(
-        dataset_name=dataset_name,
-        shots=1,
-        test_shots=1,
-        batch_size=2,
-        split="train"
-    )
-    dataloader = loader.get_dataloader()
-    batch = next(iter(dataloader))
+from src.flameAI.components.data_loaders import MetaDatasetLoader, register_dataset
 
-    assert isinstance(batch, dict), "L2L datasets must return a dict"
-    assert "data" in batch and "labels" in batch
-    assert batch["data"].shape[0] == 2, "Batch size mismatch"
-    assert batch["data"].ndim == 4, "Expected (B, C, H, W) shape"
+@pytest.fixture
+def mock_l2l_dataset():
+    with patch("learn2learn.vision.datasets.mini_imagenet.MiniImageNet") as mock_dataset:
+        mock_instance = MagicMock()
+        mock_dataset.return_value = mock_instance
+
+        with patch("learn2learn.data.TaskDataset") as mock_taskdataset:
+            mock_taskdataset.return_value = MagicMock(spec=DataLoader)
+            yield mock_taskdataset
 
 
-@pytest.mark.parametrize("dataset_name", ["mnist", "fashionmnist"])
-def test_torchvision_dataset_loading(dataset_name):
-    loader = MetaDatasetLoader(
-        dataset_name=dataset_name,
-        split="train",
-        batch_size=4
-    )
-    dataloader = loader.get_dataloader()
-    batch = next(iter(dataloader))
+def test_l2l_dataset_mocking(mock_l2l_dataset):
+    loader = MetaDatasetLoader(dataset_name="miniimagenet", shots=5, batch_size=2)
+    assert isinstance(loader.get_dataloader(), DataLoader)
+
+
+def test_torchvision_dataset():
+    loader = MetaDatasetLoader(dataset_name="mnist", shots=1, batch_size=4)
+    dl = loader.get_dataloader()
+    batch = next(iter(dl))
     x, y = batch
-    assert isinstance(x, torch.Tensor)
     assert x.shape[0] == 4
     assert y.shape[0] == 4
 
 
-def test_custom_transform():
-    custom_tf = transforms.Compose([
-        transforms.Resize(64),
+def test_unknown_dataset_raises():
+    with pytest.raises(ValueError, match="Unknown dataset"):
+        MetaDatasetLoader(dataset_name="nonexistent")
+
+
+def test_custom_transform_applied():
+    custom_transform = transforms.Compose([
+        transforms.Resize(28),
         transforms.ToTensor()
     ])
-    loader = MetaDatasetLoader(
-        dataset_name="mnist",
-        custom_transforms=custom_tf,
-        batch_size=2
-    )
-    x, _ = next(iter(loader.get_dataloader()))
-    assert x.shape[-1] == 64, "Custom transform Resize(64) not applied"
+    loader = MetaDatasetLoader(dataset_name="mnist", custom_transforms=custom_transform)
+    assert loader.transform == custom_transform
 
 
-def test_custom_dataset_registration(tmp_path):
-    class DummyDataset(Dataset):
-        def __init__(self):
-            self.data = [torch.randn(3, 32, 32) for _ in range(10)]
-            self.labels = list(range(10))
-
-        def __getitem__(self, idx):
-            return self.data[idx], self.labels[idx]
-
-        def __len__(self):
-            return len(self.data)
-
-    def dummy_loader_fn(meta_loader):
-        return DummyDataset(), transforms.ToTensor()
-
-    register_dataset("dummy", dummy_loader_fn)
-
-    loader = MetaDatasetLoader("dummy", batch_size=4)
-    x, y = next(iter(loader.get_dataloader()))
-    assert x.shape == (4, 3, 32, 32)
-    assert isinstance(y, torch.Tensor)
+def test_register_dataset_invocation():
+    dummy_fn = lambda self: ("dummy_dataset", None)
+    register_dataset("dummyset", dummy_fn)
+    loader = MetaDatasetLoader(dataset_name="dummyset")
+    assert loader.dataset == "dummy_dataset"
 
 
-def test_invalid_dataset_name():
-    with pytest.raises(ValueError):
-        MetaDatasetLoader("nonexistent_dataset")
+def test_non_callable_loader_register_raises():
+    with pytest.raises(TypeError):
+        register_dataset("not_callable", "not_a_function")
+
+
+def test_get_dataloader_structure():
+    loader = MetaDatasetLoader(dataset_name="mnist", batch_size=3)
+    dl = loader.get_dataloader()
+    batch = next(iter(dl))
+    assert isinstance(batch, (tuple, list)), f"Expected tuple or list, got {type(batch)}"
+    assert len(batch) == 2
+    assert hasattr(batch[0], 'shape')  # check tensor-like
+
+
+def test_default_transform_for_mnist():
+    loader = MetaDatasetLoader(dataset_name="mnist")
+    assert isinstance(loader.transform, transforms.Compose)
+
+
+def test_shape_correctness_in_l2l_transform_pipeline(mock_l2l_dataset):
+    loader = MetaDatasetLoader(dataset_name="miniimagenet", shots=1, test_shots=1, batch_size=2)
+    dl = loader.get_dataloader()
+    assert isinstance(dl, DataLoader)

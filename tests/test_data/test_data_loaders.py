@@ -5,7 +5,7 @@ import builtins
 from unittest import mock
 from src.flameAI.components import data_loaders
 from torchvision import transforms
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, IterableDataset
 from unittest.mock import patch, MagicMock
 import torch
 import os
@@ -13,8 +13,8 @@ import learn2learn
 
 
 
-COMMON_MSG_TMETA: str = "Skipping this..."
-
+COMMON_MSG: str = "Skipping this..."
+TESTING_MSG: str = "[TEST] Info: "
 @pytest.fixture
 def temp_bin_file():
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".bin")
@@ -52,12 +52,20 @@ from src.flameAI.components.data_loaders import MetaDatasetLoader, register_data
 
 @pytest.fixture
 def mock_l2l_dataset():
-    with patch("learn2learn.vision.datasets.mini_imagenet.MiniImageNet") as mock_dataset:
-        mock_instance = MagicMock()
-        mock_dataset.return_value = mock_instance
+    # Patch where it's *used*, not where it's defined
+    with patch("src.flameAI.components.data_loaders.learn2learn.vision.datasets") as mock_datasets:
+        # Provide a mock class that would be returned for MiniImageNet
+        mock_dataset_class = MagicMock()
+        mock_datasets.MiniImageNet = mock_dataset_class
+        mock_dataset_instance = MagicMock()
+        mock_dataset_class.return_value = mock_dataset_instance
+        print(f"{TESTING_MSG} isinstance(dataset, IterableDataset): {isinstance(mock_dataset_class.return_value, IterableDataset)}")
+        print(f"{TESTING_MSG} mock_dataset_instance {mock_dataset_class.return_value}, mock_dataset_instance.sampler {type(mock_dataset_class.return_value.sampler)}\n")
 
-        with patch("learn2learn.data.TaskDataset") as mock_taskdataset:
+        # Also patch TaskDataset
+        with patch("src.flameAI.components.data_loaders.learn2learn.data.TaskDataset") as mock_taskdataset:
             mock_taskdataset.return_value = MagicMock(spec=DataLoader)
+            print(f"{TESTING_MSG} mock_dataset_class.return_value {mock_dataset_class.return_value.sampler.__class__.__name__}")
             yield mock_taskdataset
 
 

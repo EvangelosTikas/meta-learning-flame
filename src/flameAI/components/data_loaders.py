@@ -1,15 +1,16 @@
 import os
 import requests
 import tempfile
-import warnings
+# import warnings
 
 from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
 import learn2learn
+from learn2learn.vision.benchmarks import get_tasksets
 
 # Optional: Dict registry for custom datasets
 CUSTOM_LOADERS = {}
-
+CUSTOM_NAMES   = {}
 _CACHE = {}
 
 def download_if_url(path_or_url):
@@ -88,17 +89,41 @@ class MetaDatasetLoader:
         else:
             return transforms.ToTensor()
 
-    def _load_l2l_dataset(self):
+    # Called in _resolve_dataset, during __init__: load a preset of l2l Datasets
+    def _load_l2l_dataset(self) -> Tuple(Any, Any) :
+        if self.custom_transforms is None and self.dataset_name == "miniimagenet":
+            tasksets = get_tasksets(
+                "mini-imagenet",
+                train_ways=self.ways,
+                train_samples=self.shots + self.test_shots,
+                test_ways=self.ways,
+                test_samples=self.shots + self.test_shots,
+                root=self.root
+            )
+            # Pick based on split
+            if self.split == 'train':
+                dataset = tasksets.train
+            elif self.split == 'validation':
+                dataset = tasksets.validation
+            elif self.split == 'test':
+                dataset = tasksets.test
+            else:
+                raise ValueError(f"Unknown split: {self.split}")
+            transform = None  # Already handled internally
+            return dataset, transform
+
+        # Fallback manual setup
         dataset_cls = {
             "omniglot": learn2learn.vision.datasets.FullOmniglot,
-            "miniimagenet": learn2learn.vision.datasets.MiniImageNet,
+            "miniimagenet": learn2learn.vision.datasets.MiniImagenet,
             "fc100": learn2learn.vision.datasets.FC100,
             "cifarfs": learn2learn.vision.datasets.CIFARFS,
-            "tieredimagenet": learn2learn.vision.datasets.TieredImageNet
+            "tieredimagenet": learn2learn.vision.datasets.TieredImagenet
         }.get(self.dataset_name)
 
         transform = self.custom_transforms or self._default_transform(self.dataset_name)
         base = dataset_cls(root=self.root, download=self.download, transform=transform)
+        base = learn2learn.data.MetaDataset(base)
 
         meta_dataset = learn2learn.data.TaskDataset(
             base,
@@ -113,6 +138,7 @@ class MetaDatasetLoader:
         )
         return meta_dataset, transform
 
+    # Called in _resolve_dataset, during __init__: load a preset of torchvision Datasets
     def _load_torchvision_dataset(self):
         dataset_cls = {
             "mnist": datasets.MNIST,
@@ -125,7 +151,9 @@ class MetaDatasetLoader:
         dataset = dataset_cls(self.root, train=train, transform=transform, download=self.download)
         return dataset, transform
 
+
     def _create_dataloader(self):
+        # simply return a created Dataloader object from dataset
         return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=self.shuffle)
 
     def get_dataloader(self):

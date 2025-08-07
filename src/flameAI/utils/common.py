@@ -8,6 +8,7 @@ def download_if_url(path_or_url):
         if path_or_url in _CACHE:
             return _CACHE[path_or_url]
 
+
         response = requests.get(path_or_url)
         response.raise_for_status()
         suffix = os.path.splitext(path_or_url)[-1] or ".bin"

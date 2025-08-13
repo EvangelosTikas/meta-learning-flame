@@ -67,11 +67,20 @@ project-root/
 ```
 
 # Usage
-To start a new ML project using this template, follow these steps:
 
-```python
-cd MLTMPLTE
-python -m venv venv
-source venv/bin/activate  # On Windows, use: venv\Scripts\activate
-python template.py
-```
+## Running
+The usage is split into three pipelines:
+
+-> Data pipeline: collect, wrap the dataset and add transformation, produsing the Dataloader component
+</br>Split into [Data Collect] (download/fetch) and [Data Wrap] (wrap into a set and a loader with transforms)
+
+-> Train pipeline: Start the training loop, split into training and validation phase.
+
+-> Predict pipeline: Production pipeline, it is the Testing Phase of the algorithm, evaluating its results in real\
+data predicitons.
+
+## Testing
+
+Testing is split as Unit tests per component
+
+- Data Component: test Dataloader and Dataset.

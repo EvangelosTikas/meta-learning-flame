@@ -1,9 +1,25 @@
-# Meta-Flame (Under Construction)
+# Meta-Flame
+Meta-Flame bridges the gap between reseearch, software development and production empowering the quick adaptation
+of AI algorithms to Meta-Learning. Keeping productivity acrros multiple tasks in mind,
+this sollution enables one model-agnostic package to boost AI applications, optimize
+existing AI models and reduce development time rapidly in the AI domain.
 
-This GitHub repository provides a well-structured code repository for optimizing runs for Meta-Learning tasks. Its
-main focus is Computer-Vision (CV), GenAI and MultiModal applications. You can utilize open-source datasets for running ML flows and connecting with API
-easily, with little code knowledge. Speed is key for a fast and efficient AI toolbox, and we provide a user-friendly
+A structured code repository for optimized runs for Meta-Learning tasks. The
+main focus is Computer-Vision (CV), Generative AI and MultiModal applications.
+
+You can utilize open-source datasets for running ML flows and connecting with API
+easily, with little code knowledge.
+The key is a fast and efficient AI toolbox.
+Our sollution provides a user-friendly
 tool for learning, optimization, research as well as enterprise sollutions.
+
+# Values
+
+- Economy of code
+- Targeted development
+- Agnosticism: one framework for all models and datasets.
+- Explainable AI(xAI)/Explainable software
+- Research2Development
 
 # Introduction
 

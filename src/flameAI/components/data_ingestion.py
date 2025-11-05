@@ -12,6 +12,11 @@ from torch.utils.data import Dataset
 import json
 from typing import Union, Dict, List, Optional
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 class UniversalDataset(Dataset):
     def __init__(
         self,

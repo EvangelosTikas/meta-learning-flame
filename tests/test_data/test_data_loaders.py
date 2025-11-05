@@ -12,12 +12,6 @@ import os
 import learn2learn
 
 
-# ---------------
-# Common messages
-
-COMMON_MSG: str = "Skipping this..."
-TESTING_MSG: str = "[TEST] Info: "
-
 
 # ---------------
 # Testing functions
